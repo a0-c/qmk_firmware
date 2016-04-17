@@ -31,7 +31,7 @@
 	{ k50, k51, k52, k53 }  \
 }
 
-void * matrix_init_user(void);
-void * matrix_scan_user(void);
+void matrix_init_user(void);
+void matrix_scan_user(void);
 
 #endif
