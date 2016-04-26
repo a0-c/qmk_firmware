@@ -1,4 +1,6 @@
 gh60 Rev C keyboard firmware
+![gh60 Rev C PCB](gh60revc.jpg)
+
 ======================
 
 ## Quantum MK Firmware
