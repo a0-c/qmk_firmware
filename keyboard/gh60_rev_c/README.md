@@ -20,6 +20,20 @@ gh60 Rev C keyboard firmware
     B2 Capslock LED
     B0 not connected
 	
+Fuctions to controls LED clusters
+	
+    gh60_caps_led_on()
+    gh60_poker_leds_on()
+    gh60_fn_led_on()
+    gh60_esc_led_on()
+    gh60_wasd_leds_on()
+    
+    gh60_caps_led_off()
+    gh60_poker_leds_off()
+    gh60_fn_led_off()
+    gh60_esc_led_off()
+    gh60_wasd_leds_off()
+	
 ======================
 
 ## Quantum MK Firmware
