@@ -1,4 +1,5 @@
-gh60 Rev C keyboard firmware
+## gh60 Rev C keyboard firmware
+
 ![gh60 Rev C PCB](gh60revc.jpg)
 
     /* Column pin configuration
@@ -20,7 +21,7 @@ gh60 Rev C keyboard firmware
     B2 Capslock LED
     B0 not connected
 	
-Fuctions to controls LED clusters
+Functions to controls LED clusters
 	
     gh60_caps_led_on()
     gh60_poker_leds_on()
