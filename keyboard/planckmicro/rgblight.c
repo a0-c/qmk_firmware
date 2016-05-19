@@ -107,17 +107,17 @@ void setrgb(uint8_t r, uint8_t g, uint8_t b, struct cRGB *led1) {
 uint32_t eeconfig_read_rgblight(void) {
   return eeprom_read_dword(EECONFIG_RGBLIGHT);
 }
-void eeconfig_write_rgblight(uint32_t val) {
-  eeprom_write_dword(EECONFIG_RGBLIGHT, val);
+void eeconfig_update_rgblight(uint32_t val) {
+  eeprom_update_dword(EECONFIG_RGBLIGHT, val);
 }
-void eeconfig_write_rgblight_default(void) {
-	dprintf("eeconfig_write_rgblight_default\n");
+void eeconfig_update_rgblight_default(void) {
+	dprintf("eeconfig_update_rgblight_default\n");
 	rgblight_config.enable = 1;
 	rgblight_config.mode = 1;
 	rgblight_config.hue = 200;
 	rgblight_config.sat = 204;
 	rgblight_config.val = 204;
-	eeconfig_write_rgblight(rgblight_config.raw);
+	eeconfig_update_rgblight(rgblight_config.raw);
 }
 void eeconfig_debug_rgblight(void) {
 	dprintf("rgblight_config eprom\n");
@@ -136,12 +136,12 @@ void rgblight_init(void) {
   if (!eeconfig_is_enabled()) {
 		dprintf("rgblight_init eeconfig is not enabled.\n");
     eeconfig_init();
-		eeconfig_write_rgblight_default();
+		eeconfig_update_rgblight_default();
   }
   rgblight_config.raw = eeconfig_read_rgblight();
 	if (!rgblight_config.mode) {
 		dprintf("rgblight_init rgblight_config.mode = 0. Write default values to EEPROM.\n");
-		eeconfig_write_rgblight_default();
+		eeconfig_update_rgblight_default();
 		rgblight_config.raw = eeconfig_read_rgblight();
 	}
 	eeconfig_debug_rgblight(); // display current eeprom values
@@ -189,7 +189,7 @@ void rgblight_mode(uint8_t mode) {
 	} else {
 		rgblight_config.mode = mode;
 	}
-  eeconfig_write_rgblight(rgblight_config.raw);
+  eeconfig_update_rgblight(rgblight_config.raw);
   dprintf("rgblight mode: %u\n", rgblight_config.mode);
 	if (rgblight_config.mode == 1) {
 		rgblight_timer_disable();
@@ -206,7 +206,7 @@ void rgblight_mode(uint8_t mode) {
 
 void rgblight_toggle(void) {
   rgblight_config.enable ^= 1;
-  eeconfig_write_rgblight(rgblight_config.raw);
+  eeconfig_update_rgblight(rgblight_config.raw);
   dprintf("rgblight toggle: rgblight_config.enable = %u\n", rgblight_config.enable);
 	if (rgblight_config.enable) {
 		rgblight_mode(rgblight_config.mode);
@@ -299,7 +299,7 @@ void rgblight_sethsv(uint16_t hue, uint8_t sat, uint8_t val){
 		rgblight_config.hue = hue;
 		rgblight_config.sat = sat;
 		rgblight_config.val = val;
-		eeconfig_write_rgblight(rgblight_config.raw);
+		eeconfig_update_rgblight(rgblight_config.raw);
 		dprintf("rgblight set hsv [EEPROM]: %u,%u,%u\n", rgblight_config.hue, rgblight_config.sat, rgblight_config.val);
   }
 }
@@ -328,37 +328,37 @@ void rgblight_set(void) {
 	}
 }
 
-// Animation timer -- AVR Timer3
+// Animation timer -- AVR Timer1
 void rgblight_timer_init(void) {
 	static uint8_t rgblight_timer_is_init = 0;
 	if (rgblight_timer_is_init) {
 		return;
 	}
 	rgblight_timer_is_init = 1;
-	/* Timer 3 setup */
-	TCCR3B = _BV(WGM32) //CTC mode OCR3A as TOP
+	/* Timer 1 setup */
+	TCCR1B = _BV(WGM32) //CTC mode OCR1A as TOP
 	      | _BV(CS30); //Clock selelct: clk/1
 	/* Set TOP value */
 	uint8_t sreg = SREG;
 	cli();
-	OCR3AH = (RGBLED_TIMER_TOP>>8)&0xff;
-	OCR3AL = RGBLED_TIMER_TOP&0xff;
+	OCR1AH = (RGBLED_TIMER_TOP>>8)&0xff;
+	OCR1AL = RGBLED_TIMER_TOP&0xff;
 	SREG = sreg;
 }
 void rgblight_timer_enable(void) {
-	TIMSK3 |= _BV(OCIE3A);
+	TIMSK1 |= _BV(OCIE1A);
 	dprintf("TIMER3 enabled.\n");
 }
 void rgblight_timer_disable(void) {
-	TIMSK3 &= ~_BV(OCIE3A);
+	TIMSK1 &= ~_BV(OCIE1A);
 	dprintf("TIMER3 disabled.\n");
 }
 void rgblight_timer_toggle(void) {
-	TIMSK3 ^= _BV(OCIE3A);
+	TIMSK1 ^= _BV(OCIE1A);
 	dprintf("TIMER3 toggled.\n");
 }
 
-ISR(TIMER3_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) {
 	// Mode = 1, static light, do nothing here
 	if (rgblight_config.mode>=2 && rgblight_config.mode<=5) {
 		// mode = 2 to 5, breathing mode
